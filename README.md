@@ -2,6 +2,8 @@
 
 [中文文档](./README.zh-CN.md)
 
+> This is the binary release repository. Source code, call architecture, and signaling specifications are maintained in the main Mox source repository. This README documents deployment of the packaged version.
+
 MoxSignal is the WebRTC signaling service for MoxChat voice calls, video calls, live sessions, and group SFU negotiation. HTTP APIs handle call setup and authenticated control commands; WebSocket APIs carry real-time offer, answer, ICE, hangup, and SFU events.
 
 ## Release Files

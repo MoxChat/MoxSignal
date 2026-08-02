@@ -2,6 +2,8 @@
 
 [English](./README.md)
 
+> 这是二进制发布仓库。源码、通话架构和信令规格维护在 Mox 主源码仓库；本文只说明当前打包版本的部署方式。
+
 MoxSignal 是 MoxChat 的 WebRTC 信令服务，用于语音通话、视频通话、直播和群聊 SFU 协商。HTTP API 负责通话创建和已认证控制命令，WebSocket API 负责实时交换 offer、answer、ICE、hangup 和 SFU 事件。
 
 ## 发布文件
