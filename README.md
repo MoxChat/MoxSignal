@@ -2,8 +2,6 @@
 
 [中文文档](./README.zh-CN.md)
 
-> This is the binary release repository. Source code, call architecture, and signaling specifications are maintained in the main Mox source repository. This README documents deployment of the packaged version.
-
 MoxSignal is the WebRTC signaling service for MoxChat voice calls, video calls, live sessions, and group SFU negotiation. HTTP APIs handle call setup and authenticated control commands; WebSocket APIs carry real-time offer, answer, ICE, hangup, and SFU events.
 
 ## Release Files
@@ -32,7 +30,9 @@ lzc-cli app install moxsignal.lpk
 3. Open the app at the assigned `moxsignal` subdomain.
 4. Check `https://<moxsignal-host>/healthz`.
 
-The LPK includes the MoxSignal app process and a PostgreSQL service. It also exposes UDP ingress on port `18982` for group SFU media.
+The LPK includes the MoxSignal app process and a PostgreSQL service. Group SFU media uses UDP port `8982`, the same numeric port used by the HTTP/WebSocket listener. The protocols are separate, so production deployments must expose both `8982/TCP` and `8982/UDP`.
+
+A normal HTTP reverse proxy or CDN only forwards TCP. When using Cloudflare, the hostname must be DNS-only with a directly reachable UDP path, or use a Cloudflare product that explicitly supports UDP proxying; the ordinary orange-cloud HTTP proxy is not sufficient for SFU media.
 
 ## Linux Deployment
 
@@ -50,7 +50,7 @@ chmod +x ./moxsignal-linux-amd64
 export MOXSIGNAL_ADDR=:8982
 export MOXSIGNAL_DB_DSN='postgres://moxsignal:change-me@127.0.0.1:5432/moxsignal?sslmode=disable'
 export MOXSIGNAL_PUBLIC_BASE_URL='https://moxsignal.example.com'
-export MOXSIGNAL_SFU_UDP_PORT=18982
+export MOXSIGNAL_SFU_UDP_PORT=8982
 ./moxsignal-linux-amd64
 ```
 
@@ -82,7 +82,7 @@ Create the PostgreSQL database first, then start MoxSignal from PowerShell:
 $env:MOXSIGNAL_ADDR = ":8982"
 $env:MOXSIGNAL_DB_DSN = "postgres://moxsignal:change-me@127.0.0.1:5432/moxsignal?sslmode=disable"
 $env:MOXSIGNAL_PUBLIC_BASE_URL = "https://moxsignal.example.com"
-$env:MOXSIGNAL_SFU_UDP_PORT = "18982"
+$env:MOXSIGNAL_SFU_UDP_PORT = "8982"
 .\moxsignal-windows-amd64.exe
 ```
 

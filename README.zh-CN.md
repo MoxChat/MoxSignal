@@ -2,8 +2,6 @@
 
 [English](./README.md)
 
-> 这是二进制发布仓库。源码、通话架构和信令规格维护在 Mox 主源码仓库；本文只说明当前打包版本的部署方式。
-
 MoxSignal 是 MoxChat 的 WebRTC 信令服务，用于语音通话、视频通话、直播和群聊 SFU 协商。HTTP API 负责通话创建和已认证控制命令，WebSocket API 负责实时交换 offer、answer、ICE、hangup 和 SFU 事件。
 
 ## 发布文件
@@ -32,7 +30,9 @@ lzc-cli app install moxsignal.lpk
 3. 打开分配到的 `moxsignal` 子域名。
 4. 检查 `https://<moxsignal-host>/healthz`。
 
-LPK 内包含 MoxSignal 进程和 PostgreSQL 服务，并通过 UDP ingress 暴露 `18982` 端口给群聊 SFU 媒体使用。
+LPK 内包含 MoxSignal 进程和 PostgreSQL 服务。群聊 SFU 媒体使用 `8982/UDP`，HTTP/WebSocket 使用 `8982/TCP`；两者协议不同但端口号相同，生产环境需要同时放行 `8982/TCP` 和 `8982/UDP`。
+
+普通 HTTP 反向代理或 CDN 只能转发 TCP。使用 Cloudflare 时，需要把域名设为 DNS only 并确保 UDP 可直接到达，或使用明确支持 UDP 代理的 Cloudflare 产品；普通橙色云朵 HTTP 代理不能承载 SFU 媒体。
 
 ## Linux 部署
 
@@ -50,7 +50,7 @@ chmod +x ./moxsignal-linux-amd64
 export MOXSIGNAL_ADDR=:8982
 export MOXSIGNAL_DB_DSN='postgres://moxsignal:change-me@127.0.0.1:5432/moxsignal?sslmode=disable'
 export MOXSIGNAL_PUBLIC_BASE_URL='https://moxsignal.example.com'
-export MOXSIGNAL_SFU_UDP_PORT=18982
+export MOXSIGNAL_SFU_UDP_PORT=8982
 ./moxsignal-linux-amd64
 ```
 
@@ -82,7 +82,7 @@ xattr -d com.apple.quarantine ./moxsignal-darwin-arm64
 $env:MOXSIGNAL_ADDR = ":8982"
 $env:MOXSIGNAL_DB_DSN = "postgres://moxsignal:change-me@127.0.0.1:5432/moxsignal?sslmode=disable"
 $env:MOXSIGNAL_PUBLIC_BASE_URL = "https://moxsignal.example.com"
-$env:MOXSIGNAL_SFU_UDP_PORT = "18982"
+$env:MOXSIGNAL_SFU_UDP_PORT = "8982"
 .\moxsignal-windows-amd64.exe
 ```
 
